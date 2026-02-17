@@ -14,9 +14,9 @@ async function connectToDatabase() {
   if (cachedDb && isConnected) {
     return cachedDb;
   }
-  
+
   const MONGODB_URI = process.env.MONGODB_URI;
-  
+
   if (!MONGODB_URI) {
     throw new Error("MONGODB_URI is not defined in environment variables");
   }
@@ -53,7 +53,7 @@ console.log(
 
 app.use(
   cors({
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps or curl requests)
       // Also allow localhost for development and Vercel for production
       const allowedOrigins = [
@@ -61,9 +61,13 @@ app.use(
         "http://localhost:5500",
         "http://127.0.0.1:5500",
       ];
-      
+
       // Allow Vercel production domains
-      if (!origin || allowedOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app')) {
+      if (
+        !origin ||
+        allowedOrigins.some((o) => origin.startsWith(o)) ||
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
       } else {
         callback(null, true); // Allow all origins for API calls
@@ -135,7 +139,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     // Connect to database for each request (lazy connection for serverless)
     await connectToDatabase();
-    
+
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
@@ -159,7 +163,7 @@ app.post("/api/auth/signup", async (req, res) => {
   try {
     // Connect to database for each request (lazy connection for serverless)
     await connectToDatabase();
-    
+
     const { name, email, phone, address, password } = req.body;
     if (!name || !email || !phone || !address || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -187,13 +191,11 @@ app.post("/api/auth/signup", async (req, res) => {
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    res
-      .status(201)
-      .json({
-        message: "User created successfully",
-        token,
-        user: userResponse,
-      });
+    res.status(201).json({
+      message: "User created successfully",
+      token,
+      user: userResponse,
+    });
   } catch (error) {
     console.error("Signup error:", error);
     res.status(500).json({ message: "Server error" });
@@ -205,7 +207,7 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     // Connect to database for each request (lazy connection for serverless)
     await connectToDatabase();
-    
+
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
@@ -376,13 +378,11 @@ app.post("/api/orders", authMiddleware, async (req, res) => {
     });
 
     await order.save();
-    res
-      .status(201)
-      .json({
-        message: "Order created successfully",
-        order,
-        newBalance: user.walletBalance,
-      });
+    res.status(201).json({
+      message: "Order created successfully",
+      order,
+      newBalance: user.walletBalance,
+    });
   } catch (error) {
     console.error("Create order error:", error);
     res.status(500).json({ message: "Server error" });

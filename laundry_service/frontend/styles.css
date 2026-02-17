@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
-*{
-    font-family: Georgia, 'Times New Roman', Times, serif;
+* {
+  font-family: Georgia, "Times New Roman", Times, serif;
 }
 :root {
   --primary: #2a9d8f;
@@ -65,7 +65,6 @@ body {
   display: none !important;
 }
 
-/* Auth Forms */
 #auth-forms {
   flex: 1;
   display: flex;
