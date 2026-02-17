@@ -1,0 +1,14 @@
+{
+  "name": "freshclean-laundry",
+  "version": "1.0.0",
+  "description": "FreshClean Laundry Service - Full Stack Application",
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start",
+    "build": "echo 'No build required'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

@@ -8,9 +8,10 @@ require("dotenv").config();
 
 // MongoDB connection caching for serverless (prevents reconnecting on every function call)
 let cachedDb = null;
+let isConnected = false;
 
 async function connectToDatabase() {
-  if (cachedDb) {
+  if (cachedDb && isConnected) {
     return cachedDb;
   }
   
@@ -20,18 +21,22 @@ async function connectToDatabase() {
     throw new Error("MONGODB_URI is not defined in environment variables");
   }
 
-  cachedDb = await mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    dbName: "freshclean",
-  });
-  
-  console.log("Connected to MongoDB Atlas");
-  return cachedDb;
+  try {
+    cachedDb = await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName: "freshclean",
+    });
+    isConnected = true;
+    console.log("Connected to MongoDB Atlas");
+    return cachedDb;
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    throw error;
+  }
 }
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 console.log("Starting server...");
 console.log(
@@ -482,8 +487,5 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(` Server running on port ${PORT}`);
-  console.log(` Frontend: http://localhost:${PORT}`);
-  console.log(` API: http://localhost:${PORT}/api/health`);
-});
+// Export for Vercel serverless
+module.exports = app;
