@@ -1,4 +1,3 @@
-// API Base URL - uses relative path for production, localhost for development
 const API_BASE_URL = "/api";
 let currentUser = null;
 let authToken = null;
